@@ -464,6 +464,7 @@ void IrBeo4::beo_decode_fsm(uint32_t pulseCode, size_t n_sym) {
    
         uint32_t data = ((uint32_t)n_sym << 16) + (beoCode & 0xffff); 
         uint32_t beoCmd = beoCode & 0xff;
+        /*swo
         if(isRepeatable(beoCmd)) {
           m_beoWait=1; // let code wait in quarantine
           xQueueSend(m_beo4_quarantine_queue,&data,0);
@@ -471,7 +472,12 @@ void IrBeo4::beo_decode_fsm(uint32_t pulseCode, size_t n_sym) {
           m_beoWait=0; // send out directly
           xQueueSend(m_beo4_rx_queue,&data,0);
         }
+          */
+         //swo add
+        m_beoWait=0; // send out directly
+        xQueueSend(m_beo4_rx_queue,&data,0);
         last_cmd_was_repeat_or_repeatable = isRepeatable(beoCmd)  || isRepeatkey(beoCmd);
+        //swo end
     
       }
       m_rxFSM=rxSt::Idle;
