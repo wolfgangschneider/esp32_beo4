@@ -1,7 +1,15 @@
 #include <Arduino.h>
+#include "esp_log.h"  // Add this line for ESP_LOGI
 #include "IrBeo4.h"
 
+
+#if defined(m5stackAtomS3)
+constexpr int8_t con_IR_RX_PIN = 8;  // IR receive pin
+#elif defined(m5stackAtom)
+constexpr int8_t con_IR_RX_PIN = 33; // IR receive pin
+#else
 constexpr int8_t con_IR_RX_PIN = 15;  // IR receive pin
+#endif
 IrBeo4 beo4(con_IR_RX_PIN);           // instance of beo4 decoder
 
 // solution with task and queue
@@ -33,8 +41,16 @@ void beo4_task(void *parameter) {
 
 void setup() {
   Serial.begin(115200);
-  // pinMode(led_pin,OUTPUT);    // led for callback
-  // digitalWrite(led_pin,HIGH); // led off
+ 
+  // Add these test lines
+  // Set log level for your library
+  //esp_log_level_set("IR_BEO4", ESP_LOG_INFO);
+
+
+  
+  
+  
+  
   beo4_rx_queue = xQueueCreate(50, sizeof(uint32_t));
   xTaskCreatePinnedToCore(beo4_task,"beo4_task",10000,NULL,0,&beo4_task_h,0);
   beo4.Begin(beo4_rx_queue);

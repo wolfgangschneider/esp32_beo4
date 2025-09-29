@@ -365,7 +365,8 @@ int IrBeo4::rmt_rx_setup(void) {
     ESP_LOGE(IR_BEO4,"m_beo4_quarantine_queue failed\n");
     return -1;
   }
-  if(pdPASS!=xTaskCreatePinnedToCore(beo4_quarantine_task,"beo4_quarantine_task",2048,this,1,&m_beo4_quarantine_task,1)){
+  // icrease Stacksize for ATOMS3 from 2048 to 4096
+  if(pdPASS!=xTaskCreatePinnedToCore(beo4_quarantine_task,"beo4_quarantine_task",4096,this,1,&m_beo4_quarantine_task,1)){
     ESP_LOGE(IR_BEO4,"beo4_quarantine_task failed\n");
     return -1;
   }
@@ -475,6 +476,7 @@ void IrBeo4::beo_decode_fsm(uint32_t pulseCode, size_t n_sym) {
           */
          //swo add
         m_beoWait=0; // send out directly
+        Serial.printf("BeoCode: 0x%04X Source: %s Command: %s \n",beoCode,beo_src_tbl(beoCode),beo_cmd_tbl(beoCode));
         xQueueSend(m_beo4_rx_queue,&data,0);
         last_cmd_was_repeat_or_repeatable = isRepeatable(beoCmd)  || isRepeatkey(beoCmd);
         //swo end
